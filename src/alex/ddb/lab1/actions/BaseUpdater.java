@@ -21,6 +21,22 @@ public class BaseUpdater {
 
     }
 
+    public boolean updateIncident(
+            Connection connection, int registrationNumber, String decision, String description, Date date)
+            throws SQLException{
+        String query = "update alex.incident set description = ?, decision = ?, incidentdate = ?"
+                + " where registrationnumber = ?";
+        PreparedStatement pStatment = connection.prepareStatement(query);
+        pStatment.setString(1, description);
+        pStatment.setString(2, decision);
+        pStatment.setDate(3, date);
+        pStatment.setInt(4, registrationNumber);
+        int result = pStatment.executeUpdate();
+
+        if(result != 0) return true;
+        else return false;
+    }
+
     public boolean addIncedent(
             Connection connection, String decision, String description, Date date)
             throws SQLException{

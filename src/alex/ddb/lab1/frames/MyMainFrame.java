@@ -76,6 +76,9 @@ public class MyMainFrame extends JFrame{
         JMenuItem addIncidentMenuItem = new JMenuItem("Add incident");
         addIncidentMenuItem.addActionListener(new AddIncidentMenuItemHandler());
         incidentMenu.add(addIncidentMenuItem);
+        JMenuItem updateIncidentMenuItem = new JMenuItem("Update incident");
+        updateIncidentMenuItem.addActionListener(new UpdateIncidentMenuItemHandler());
+        incidentMenu.add(updateIncidentMenuItem);
         JMenuItem deleteIncidentMenuItem = new JMenuItem("Delete incident");
         deleteIncidentMenuItem.addActionListener(new DeleteIncidentdHandler());
         incidentMenu.add(deleteIncidentMenuItem);
@@ -165,6 +168,55 @@ public class MyMainFrame extends JFrame{
     }
 
 
+    private class UpdateIncidentMenuItemHandler implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (!((String) tableNames.getSelectedItem()).equals("INCIDENT")) {
+                    JOptionPane.showMessageDialog(null, "Не выбрана необходимая таблица.",
+                            "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                if (table.getSelectedRow() == -1) {
+                    JOptionPane.showMessageDialog(null, "Запись не выбрана.",
+                            "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
+                AddIncidentDialog addIncident = new AddIncidentDialog(thisFrame);
+                addIncident.setDecision((String)table.getValueAt(table.getSelectedRow(), 3));
+                addIncident.setDescription((String)table.getValueAt(table.getSelectedRow(), 2));
+                addIncident.setDate((Date)table.getValueAt(table.getSelectedRow(), 1));
+                addIncident.setVisible(true);
+                if (!addIncident.getOk()) {
+                    return;
+                }
+                BaseUpdater updater = new BaseUpdater();
+
+                boolean result = updater.updateIncident(connection,
+                        (Integer)table.getValueAt(table.getSelectedRow(), 0),
+                        addIncident.getDecision(), addIncident.getDescription(),
+                        addIncident.getDate());
+
+                if (result) {
+                    JOptionPane.showMessageDialog(null, "Информация была обновлена", "Message",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    tableNames.setSelectedItem("INCIDENT");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Информация не была обновлена", "Ошибка",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Неверный формат даты.", "Ошибка",
+                            JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                 JOptionPane.showMessageDialog(null, "Ошибка. Информация не была обновлена.",
+                                "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
     private class PersonIncidentsQuantityHandler implements ActionListener{
 
         @Override

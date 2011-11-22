@@ -37,6 +37,7 @@ public class AddIncidentDialog extends JDialog{
     private JTextArea incidentDescription;
     private boolean ok = false;
     private JButton okButton;
+    private String decision = "Не возбуждать уголовное дело";
 
     public AddIncidentDialog(JFrame owner){
         super(owner, "Add incident", true);
@@ -66,11 +67,11 @@ public class AddIncidentDialog extends JDialog{
         vBox.add(panLabel1);
         vBox.add(incidentDate);
         vBox.add(Box.createVerticalStrut(20));
-        JPanel panLabel2= new JPanel();
-        panLabel2.add(new JLabel("Incident decision: "));
-        vBox.add(panLabel2);
-        vBox.add(incidentDecision);
-        vBox.add(Box.createVerticalStrut(20));
+        //JPanel panLabel2= new JPanel();
+        //panLabel2.add(new JLabel("Incident decision: "));
+        //vBox.add(panLabel2);
+       // vBox.add(incidentDecision);
+        //vBox.add(Box.createVerticalStrut(20));
         JPanel panLabel3= new JPanel();
         panLabel3.add(new JLabel("Incident description: "));
         vBox.add(panLabel3);
@@ -88,11 +89,21 @@ public class AddIncidentDialog extends JDialog{
     }
 
     public String getDecision(){
-        return (String)incidentDecision.getSelectedItem();
+        //return (String)incidentDecision.getSelectedItem();
+        return decision;
+    }
+
+    public void setDecision(String aDecision){
+        //incidentDecision.setSelectedItem(decision);
+        decision = aDecision;
     }
 
     public String getDescription(){
         return incidentDescription.getText();
+    }
+
+    public void setDescription(String description){
+        incidentDescription.setText(description);
     }
 
     public Date getDate() throws ParseException{
@@ -100,6 +111,10 @@ public class AddIncidentDialog extends JDialog{
         DateFormat format = DateFormat.getDateInstance();
         java.util.Date inputDate = format.parse(date);
         return new Date(inputDate.getTime());
+    }
+
+    public void setDate(Date date){
+        incidentDate.setValue(date);
     }
 
     private class ButtonHandler implements ActionListener{
