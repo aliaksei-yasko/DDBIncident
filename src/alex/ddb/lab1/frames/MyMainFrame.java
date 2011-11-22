@@ -97,6 +97,9 @@ public class MyMainFrame extends JFrame{
         JMenuItem addPersonMenuItem = new JMenuItem("Add person");
         addPersonMenuItem.addActionListener(new AddPersonHandler());
         personMenu.add(addPersonMenuItem);
+        JMenuItem updatePersonMenuItem = new JMenuItem("Update person");
+        updatePersonMenuItem.addActionListener(new UpdatePersonHandler());
+        personMenu.add(updatePersonMenuItem);
         JMenuItem deletePersonMenuItem = new JMenuItem("Delete person");
         deletePersonMenuItem.addActionListener(new DeletePersonHandler());
         personMenu.add(deletePersonMenuItem);
@@ -167,6 +170,57 @@ public class MyMainFrame extends JFrame{
         return DriverManager.getConnection(url, username, password);
     }
 
+    private class UpdatePersonHandler implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (!((String) tableNames.getSelectedItem()).equals("PERSON")) {
+                    JOptionPane.showMessageDialog(null, "Не выбрана необходимая таблица.",
+                            "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                if (table.getSelectedRow() == -1) {
+                    JOptionPane.showMessageDialog(null, "Запись не выбрана.",
+                            "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                AddPersonDialog addPerson = new AddPersonDialog(thisFrame);
+                addPerson.setFirstName((String)table.getValueAt(table.getSelectedRow(), 1));
+                addPerson.setLastName((String)table.getValueAt(table.getSelectedRow(), 2));
+                addPerson.setPassportNumber((Integer)table.getValueAt(table.getSelectedRow(), 3));
+                addPerson.setAddress((String)table.getValueAt(table.getSelectedRow(), 4));
+                addPerson.setBurnDate((Date)table.getValueAt(table.getSelectedRow(), 5));
+                addPerson.setCourtRate((Integer)table.getValueAt(table.getSelectedRow(), 6));
+                addPerson.setVisible(true);
+                if (!addPerson.getOk()) {
+                    return;
+                }
+                BaseUpdater updater = new BaseUpdater();
+                boolean result = updater.updatePerson(connection,
+                        (Integer)table.getValueAt(table.getSelectedRow(), 0), addPerson.getFirstName(),
+                        addPerson.getLastName(), addPerson.getAddress(),
+                        addPerson.getPassportNumber(), addPerson.getCourtRate(),
+                        addPerson.getBurnDate());
+
+                if (result) {
+                    JOptionPane.showMessageDialog(null, "Информация была обновлена", "Message",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    tableNames.setSelectedItem("PERSON");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Информация не была обновлена.", "Ошибка",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Неверный формат даты.", "Ошибка",
+                            JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                 JOptionPane.showMessageDialog(null, "Ошибка. Информация не была обновлена.",
+                                "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
 
     private class UpdateIncidentMenuItemHandler implements ActionListener{
         @Override

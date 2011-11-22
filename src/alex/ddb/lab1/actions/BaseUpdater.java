@@ -73,6 +73,25 @@ public class BaseUpdater {
         else return false;
     }
 
+    public boolean updatePerson(Connection connection, int personNumber, String firstName, String lastName,
+            String address, int passportNumber, int courtRate, Date burnDate) throws SQLException{
+        String query = "update alex.person set firstname = ?, lastname = ?, passportnumber = ?,"
+                + " address = ?, burndate = ?, courtrate = ? "
+                + "where personnumber = ?";
+        PreparedStatement pStatment = connection.prepareStatement(query);
+        pStatment.setString(1, firstName);
+        pStatment.setString(2, lastName);
+        pStatment.setInt(3, passportNumber);
+        pStatment.setString(4, address);
+        pStatment.setDate(5, burnDate);
+        pStatment.setInt(6, courtRate);
+        pStatment.setInt(7, personNumber);
+        int result = pStatment.executeUpdate();
+
+        if(result != 0) return true;
+        else return false;
+    }
+
     public boolean addPerson(Connection connection, String firstName, String lastName,
             String address, int passportNumber, int courtRate, Date burnDate) throws SQLException{
         String query = "insert into alex.person(firstname, lastname, passportnumber,"

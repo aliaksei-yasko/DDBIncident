@@ -110,20 +110,40 @@ public class AddPersonDialog extends JDialog{
         return firstNameField.getText();
     }
 
+    public void setFirstName(String firstName){
+        firstNameField.setText(firstName);
+    }
+
     public String getLastName(){
         return lastNameField.getText();
+    }
+
+    public void setLastName(String lastName){
+        lastNameField.setText(lastName);
     }
 
     public String getAddress(){
         return addressField.getText();
     }
 
+    public void setAddress(String address){
+        addressField.setText(address);
+    }
+
     public int getPassportNumber(){
         return Integer.parseInt(passportNumberField.getValue().toString());
     }
 
+    public void setPassportNumber(int passportNumber){
+        passportNumberField.setValue(passportNumber);
+    }
+
     public int getCourtRate(){
          return Integer.parseInt(courtRateField.getValue().toString());
+    }
+
+    public void setCourtRate(int courtRate){
+        courtRateField.setValue(courtRate);
     }
 
     public Date getBurnDate() throws ParseException{
@@ -131,6 +151,10 @@ public class AddPersonDialog extends JDialog{
         DateFormat format = DateFormat.getDateInstance();
         java.util.Date inputDate = format.parse(date);
         return new Date(inputDate.getTime());
+    }
+
+    public void setBurnDate(Date burnDate){
+        burnDateField.setValue(burnDate);
     }
 
     private class ButtonHandler implements ActionListener{
