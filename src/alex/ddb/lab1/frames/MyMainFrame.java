@@ -147,6 +147,8 @@ public class MyMainFrame extends JFrame{
                 tableNames.addItem(tables.getString(3));
             }
             tables.close();
+
+            tableNames.setSelectedItem("INCIDENT");
         } catch (SQLException ex) {
             ex.printStackTrace();
         }

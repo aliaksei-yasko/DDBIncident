@@ -49,7 +49,8 @@ REFERENCES CriminalCase (CriminalNumber) ON DELETE CASCADE;
 CREATE TABLE IncidentInvolvment(
 	PersonNumber INTEGER,
 	RegistrationNumber INTEGER,
-	StatusNumber INTEGER
+	StatusNumber INTEGER,
+	UNIQUE(PersonNumber, RegistrationNumber, StatusNumber)
 );
 
 ALTER TABLE IncidentInvolvment ADD FOREIGN KEY (PersonNumber)
