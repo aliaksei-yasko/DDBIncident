@@ -9,7 +9,7 @@ CREATE TABLE CriminalCase(
 	CriminalNumber INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
 	CriminalDate DATE,
 	CriminalNote VARCHAR(10000),
-        RegistrationNumber INTEGER
+		RegistrationNumber INTEGER UNIQUE
 );
 
 ALTER TABLE CriminalCase ADD FOREIGN KEY (RegistrationNumber)

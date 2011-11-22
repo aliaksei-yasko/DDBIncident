@@ -20,9 +20,22 @@ public class BaseViewer {
 
     }
 
+    public int viewPersonIncidentsQuantity(Connection connection, int personNumber)
+            throws SQLException{
+        //Select data about person's quantity of incident
+        String query = "select count(*) from alex.incidentinvolvment where "
+                + "personnumber = ?";
+        PreparedStatement pStatment = connection.prepareStatement(query);
+        pStatment.setInt(1, personNumber);
+        ResultSet result = pStatment.executeQuery();
+        result.next();
+        int quantity = result.getInt(1);
+        return quantity;
+    }
+
     public int viewQuantityIncidentInTimeInterval(Connection connection, Date afterDate,
             Date beforeDate) throws SQLException{
-        //Select data about article
+        //Select data about incident time interval
         String query = "select count(*) from alex.incident where "
                 + "incidentdate > ? and incidentdate < ?";
         PreparedStatement pStatment = connection.prepareStatement(query);
@@ -135,7 +148,8 @@ public class BaseViewer {
         }
 
         //Select data about person involvment in incident
-        query = "select firstname, statusname from alex.person, alex.incidentinvolvment, alex.status where "
+        query = "select firstname, lastname, passportnumber, statusname"
+                + " from alex.person, alex.incidentinvolvment, alex.status where "
                 + "alex.incidentinvolvment.registrationnumber=? and "
                 + "alex.incidentinvolvment.personnumber=alex.person.personnumber and "
                 + "alex.incidentinvolvment.statusnumber=alex.status.statusnumber";
@@ -148,7 +162,8 @@ public class BaseViewer {
                 resultString = resultString + "\n   Лица, учавствовавшие в проишествии:  ";
              }
             resultString = resultString + "\n        " + result.getString("firstname")
-                    + " - " + result.getString("statusname");
+                    + " " + result.getString("lastname") + ": " + result.getString("passportnumber")
+                     + " - " + result.getString("statusname");
             i++;
         }
 

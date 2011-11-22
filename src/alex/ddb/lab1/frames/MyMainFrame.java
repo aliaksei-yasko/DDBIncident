@@ -124,7 +124,9 @@ public class MyMainFrame extends JFrame{
         JMenuItem incidentsInTimeIntervalMenuItem = new JMenuItem("Incident quantity");
         incidentsInTimeIntervalMenuItem.addActionListener(new IncidentsInTimeIntervalHandler());
         specificOperationsMenu.add(incidentsInTimeIntervalMenuItem);
-
+        JMenuItem personIncidentsQuantity = new JMenuItem("Person's quantity of incidents");
+        personIncidentsQuantity.addActionListener(new PersonIncidentsQuantityHandler());
+        specificOperationsMenu.add(personIncidentsQuantity);
 
         //Creating combobox
         JPanel panel = new JPanel();
@@ -158,6 +160,40 @@ public class MyMainFrame extends JFrame{
         String url = "jdbc:derby://localhost:1527/IncidentDataBase";
 
         return DriverManager.getConnection(url, username, password);
+    }
+
+
+    private class PersonIncidentsQuantityHandler implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (!((String) tableNames.getSelectedItem()).equals("PERSON")) {
+                    JOptionPane.showMessageDialog(null, "Не выбрана необходимая таблица.",
+                            "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
+                if (table.getSelectedRow() == -1) {
+                    JOptionPane.showMessageDialog(null, "Запись не выбрана.",
+                            "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
+                int personNumber = (Integer)table.getValueAt(table.getSelectedRow(), 0);
+                BaseViewer viewer = new BaseViewer();
+                int quantuty = viewer.viewPersonIncidentsQuantity(connection, personNumber);
+
+                JOptionPane.showMessageDialog(null, "Количество происшествий в "
+                        + "которых зарегистрированно лицо: " + quantuty,
+                            "Message", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Ошибка при работе с базой",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
     }
 
     private class IncidentsInTimeIntervalHandler implements ActionListener{
@@ -214,36 +250,11 @@ public class MyMainFrame extends JFrame{
                 }
                 int selectedRow = table.getSelectedRow();
                 int incidentNumber = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-                
-                //Check availability of criminal case
-                String query = "select * from alex.criminalcase where"
-                        + " registrationnumber = ?";
-                PreparedStatement pStatment = connection.prepareStatement(query);
-                pStatment.setInt(1, incidentNumber);
-                ResultSet result = pStatment.executeQuery();
-                if (result.next()){
-                    JOptionPane.showMessageDialog(null, "По проишествию уже возбуждено уголовное дело.",
-                            "Message", JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-
-                query = "select decision from alex.incident where"
-                        + " registrationnumber = ?";
-                pStatment = connection.prepareStatement(query);
-                pStatment.setInt(1, incidentNumber);
-                result = pStatment.executeQuery();
-                if (result.next()){
-                    if (result.getString("decision").equals("Не возбуждать уголовное дело")){
-                        JOptionPane.showMessageDialog(null, "Было принято решение не возбуждать уголовное дело.",
-                            "Message", JOptionPane.INFORMATION_MESSAGE);
-                        return;
-                    }
-                }
 
                 //Selecte all having articles
-                query = "select articlenumber, articlename from alex.article";
-                pStatment = connection.prepareStatement(query);
-                result = pStatment.executeQuery();
+                String query = "select articlenumber, articlename from alex.article";
+                PreparedStatement pStatment = connection.prepareStatement(query);
+                ResultSet result = pStatment.executeQuery();
 
                 Map<String, Integer> articles = new HashMap<String, Integer>();
                 while (result.next()){
@@ -259,8 +270,6 @@ public class MyMainFrame extends JFrame{
                     return;
                 }
 
-                int[] ar = dialog.getArticleKeys();
-
                 //Execute operation
                 BaseUpdater updater = new BaseUpdater();
                 boolean resultBool = updater.addCriminalCase(connection, dialog.getCriminalDate(),
@@ -269,6 +278,7 @@ public class MyMainFrame extends JFrame{
                 if (resultBool) {
                     JOptionPane.showMessageDialog(null, "Уголовное дело было добавлено.",
                             "Message", JOptionPane.INFORMATION_MESSAGE);
+                    tableNames.setSelectedItem("INCIDENT");
                 } else {
                     JOptionPane.showMessageDialog(null, "Уголовное дело не было добавлено.",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -278,7 +288,7 @@ public class MyMainFrame extends JFrame{
                 JOptionPane.showMessageDialog(null, "Неверный формат даты.", "Ошибка",
                             JOptionPane.ERROR_MESSAGE);
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "Ошибка при работе с базой",
+                JOptionPane.showMessageDialog(null, "Ошибка. Уголовное дело не было добавлено.",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -341,7 +351,7 @@ public class MyMainFrame extends JFrame{
                 }
 
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "Ошибка при работе с базой",
+                JOptionPane.showMessageDialog(null, "Ошибка. Лицо не было добавлено к происшествию",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -446,7 +456,7 @@ public class MyMainFrame extends JFrame{
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                 JOptionPane.showMessageDialog(null, "Ошибка при работе с базой.",
+                 JOptionPane.showMessageDialog(null, "Ошибка. Статья не была добавлена.",
                                 "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -553,7 +563,7 @@ public class MyMainFrame extends JFrame{
                             JOptionPane.ERROR_MESSAGE);
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                 JOptionPane.showMessageDialog(null, "Ошибка при работе с базой.",
+                 JOptionPane.showMessageDialog(null, "Ошибка. Лицо не было добавлено.",
                                 "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -693,7 +703,7 @@ public class MyMainFrame extends JFrame{
                             JOptionPane.ERROR_MESSAGE);
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                 JOptionPane.showMessageDialog(null, "Ошибка при работе с базой.",
+                 JOptionPane.showMessageDialog(null, "Ошибка. Происшествие не было добавлено.",
                                 "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
         }
